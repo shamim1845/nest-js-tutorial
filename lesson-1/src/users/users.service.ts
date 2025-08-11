@@ -1,31 +1,71 @@
 import { Injectable } from '@nestjs/common';
 
+export type User = {
+  id?: number;
+  name: string;
+  age: number;
+  gender: string;
+  isMarried: boolean;
+};
 @Injectable()
-export class UserService {
-  getUsers(): [object] {
-    return [
-        {
-            msg: "sucess",
-            status:200,
-            data: [
-                {
-                    id:1,
-                    name:"shamim"
-                },
-                {
-                    id:2,
-                    name:"shakib"
-                },
-                {
-                    id:3,
-                    name:"sohel"
-                },
-                {
-                    id:4,
-                    name:"ahsan"
-                },
-            ]
-        }
-    ]
+export class UsersService {
+  users: User[] = [
+    {
+      id: 1,
+      name: 'shamim',
+      age: 25,
+      gender: 'male',
+      isMarried: false,
+    },
+    {
+      id: 2,
+      name: 'shakib',
+      age: 24,
+      gender: 'male',
+      isMarried: false,
+    },
+    {
+      id: 3,
+      name: 'sohel',
+      age: 27,
+      gender: 'male',
+      isMarried: false,
+    },
+    {
+      id: 4,
+      name: 'ahsan',
+      age: 22,
+      gender: 'male',
+      isMarried: false,
+    },
+  ];
+
+  getUsers({ name, age }: { name: string; age: string }): object {
+    return {
+      msg: 'sucess',
+      status: 200,
+      data: this.users
+        .filter((user) => (name ? user.name === name : user))
+        .filter((user) => (age ? user.age >= Number(age) : user)),
+    };
+  }
+
+  getUserById(id: number): object {
+    return {
+      msg: 'sucess',
+      status: 200,
+      data: this.users.find((user) => user.id === id),
+    };
+  }
+
+  createUser(user: User): object {
+    const currentUser = { ...user, id: this.users.length + 1 };
+    this.users.push(currentUser);
+
+    return {
+      msg: 'sucess',
+      status: 201,
+      data: currentUser,
+    };
   }
 }
