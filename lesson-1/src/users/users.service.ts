@@ -68,4 +68,51 @@ export class UsersService {
       data: currentUser,
     };
   }
+
+  updateUser(id: number, userData: User) {
+    const currentUser = this.users.find((u) => u.id === id);
+
+    if (!currentUser) {
+      return {
+        msg: 'User not found!',
+        status: 400,
+        data: null,
+      };
+    }
+
+    const updatedUser = { ...currentUser, ...userData };
+
+    this.users = this.users.map((u) => {
+      if (u.id === id) {
+        return updatedUser;
+      }
+      return u;
+    });
+
+    return {
+      msg: 'sucess',
+      status: 200,
+      data: updatedUser,
+    };
+  }
+
+  deleteUser(id: number) {
+    const currentUser = this.users.find((u) => u.id === id);
+
+    if (!currentUser) {
+      return {
+        msg: 'User not found!',
+        status: 400,
+        data: null,
+      };
+    }
+
+    this.users = this.users.filter((u) => u.id !== id);
+
+    return {
+      msg: 'sucess',
+      status: 200,
+      data: currentUser,
+    };
+  }
 }
