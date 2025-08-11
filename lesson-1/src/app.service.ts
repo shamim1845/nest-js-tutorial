@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   getHomeContent(): object {
     return {
-      msg: "hello",
-      status: 500
-    }
+      msg: 'hello',
+      status: 500,
+    };
   }
 }
