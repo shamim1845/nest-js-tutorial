@@ -10,6 +10,6 @@ export type User = {
   id: number;
   name: string;
   age: number;
-  gender: string;
+  gender?: string;
   isMarried: boolean;
 };

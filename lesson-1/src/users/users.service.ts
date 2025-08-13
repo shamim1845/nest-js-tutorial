@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ApiResponse, User } from 'types';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 const getRandomUsers = (length: number): User[] => {
   const users = Array.from({ length }, (_, i) => {
@@ -85,7 +86,7 @@ export class UsersService {
     };
   }
 
-  createUser(user: User): ApiResponse {
+  createUser(user: CreateUserDto): ApiResponse {
     const currentUser = {
       id: this.users.length + 1,
       ...{

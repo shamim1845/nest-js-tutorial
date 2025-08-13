@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import type { User } from 'types';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 // http://localhost:8000/users
 @Controller('users')
@@ -35,7 +36,9 @@ export class UsersController {
   }
 
   @Post()
-  createUser(@Body() user: User) {
+  createUser(@Body() user: CreateUserDto) {
+    console.log(typeof user, user instanceof CreateUserDto);
+
     return this.usersService.createUser(user);
   }
 
