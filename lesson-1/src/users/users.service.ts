@@ -1,81 +1,117 @@
 import { Injectable } from '@nestjs/common';
+import { ApiResponse, User } from 'types';
 
-export type User = {
-  id?: number;
-  name: string;
-  age: number;
-  gender: string;
-  isMarried: boolean;
+const getRandomUsers = (length: number): User[] => {
+  const users = Array.from({ length }, (_, i) => {
+    const firstNames = [
+      'Shamim',
+      'Shakib',
+      'Sohel',
+      'Ahsan',
+      'Nadia',
+      'Sumaiya',
+      'Hasan',
+      'Rafi',
+      'Tanvir',
+      'Mitu',
+      'Omar',
+      'Sami',
+      'Fahim',
+      'Zara',
+      'Arif',
+      'Mim',
+      'Mehedi',
+      'Sajid',
+      'Tania',
+      'Nafisa',
+    ];
+    const genders = ['male', 'female'];
+
+    const randomName =
+      firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomGender = genders[Math.floor(Math.random() * genders.length)];
+    const randomAge = Math.floor(Math.random() * (45 - 18 + 1)) + 18;
+    const randomMaritalStatus = Math.random() < 0.4; // ~40% married
+
+    return {
+      id: i + 1,
+      name: randomName.toLowerCase(),
+      age: randomAge,
+      gender: randomGender,
+      isMarried: randomMaritalStatus,
+    };
+  });
+
+  return users;
 };
+
 @Injectable()
 export class UsersService {
-  users: User[] = [
-    {
-      id: 1,
-      name: 'shamim',
-      age: 25,
-      gender: 'male',
-      isMarried: false,
-    },
-    {
-      id: 2,
-      name: 'shakib',
-      age: 24,
-      gender: 'male',
-      isMarried: false,
-    },
-    {
-      id: 3,
-      name: 'sohel',
-      age: 27,
-      gender: 'male',
-      isMarried: false,
-    },
-    {
-      id: 4,
-      name: 'ahsan',
-      age: 22,
-      gender: 'male',
-      isMarried: false,
-    },
-  ];
+  users: User[] = getRandomUsers(200);
 
-  getUsers({ name, age }: { name: string; age: string }): object {
+  getUsers({
+    name,
+    age,
+    page,
+    limit,
+  }: {
+    name: string;
+    age: number;
+    page: number;
+    limit: number;
+  }): ApiResponse {
+    console.log({
+      name,
+      age,
+      page,
+      limit,
+    });
+
     return {
-      msg: 'sucess',
-      status: 200,
+      message: 'sucess',
+      statusCode: 200,
       data: this.users
         .filter((user) => (name ? user.name === name : user))
-        .filter((user) => (age ? user.age >= Number(age) : user)),
+        .filter((user) => (age ? user.age >= age : user)),
+      // .slice(page - 1 * 10, limit * page),
     };
   }
 
-  getUserById(id: number): object {
+  getUserById(id: number): ApiResponse {
     return {
-      msg: 'sucess',
-      status: 200,
+      message: 'sucess',
+      statusCode: 200,
       data: this.users.find((user) => user.id === id),
     };
   }
 
-  createUser(user: User): object {
-    const currentUser = { ...user, id: this.users.length + 1 };
+  createUser(user: User): ApiResponse {
+    const currentUser = {
+      id: this.users.length + 1,
+      ...{
+        name: user?.name,
+        age: user?.age,
+        gender: user?.gender,
+        isMarried: user?.isMarried,
+      },
+    };
+
     this.users.push(currentUser);
 
     return {
-      msg: 'sucess',
-      status: 201,
+      message: 'sucess',
+      statusCode: 201,
       data: currentUser,
     };
   }
 
-  updateUser(id: number, userData: User) {
+  updateUser(id: number, userData: User): ApiResponse {
     const currentUser = this.users.find((u) => u.id === id);
 
     if (!currentUser) {
       return {
-        msg: 'User not found!',
-        status: 400,
+        message: 'User not found!',
+        statusCode: 400,
         data: null,
       };
     }
@@ -90,19 +126,19 @@ export class UsersService {
     });
 
     return {
-      msg: 'sucess',
-      status: 200,
+      message: 'sucess',
+      statusCode: 200,
       data: updatedUser,
     };
   }
 
-  deleteUser(id: number) {
+  deleteUser(id: number): ApiResponse {
     const currentUser = this.users.find((u) => u.id === id);
 
     if (!currentUser) {
       return {
-        msg: 'User not found!',
-        status: 400,
+        message: 'User not found!',
+        statusCode: 400,
         data: null,
       };
     }
@@ -110,8 +146,8 @@ export class UsersService {
     this.users = this.users.filter((u) => u.id !== id);
 
     return {
-      msg: 'sucess',
-      status: 200,
+      message: 'sucess',
+      statusCode: 200,
       data: currentUser,
     };
   }

@@ -1,15 +1,17 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import type { User } from './users.service';
+import type { User } from 'types';
 
 // http://localhost:8000/users
 @Controller('users')
@@ -17,13 +19,19 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getUsers(@Query() { name, age }: { name: string; age: string }): object {
-    return this.usersService.getUsers({ name, age });
+  getUsers(
+    @Query('name') name: string,
+    @Query('age', new DefaultValuePipe(0), ParseIntPipe) age: number,
+    // For pagination
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    return this.usersService.getUsers({ name, age, page, limit });
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string): object {
-    return this.usersService.getUserById(Number(id));
+  getUserById(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.getUserById(id);
   }
 
   @Post()
@@ -32,12 +40,12 @@ export class UsersController {
   }
 
   @Patch(':id')
-  updateUser(@Param('id') id: string, @Body() user: User) {
-    return this.usersService.updateUser(Number(id), user);
+  updateUser(@Param('id', ParseIntPipe) id: number, @Body() user: User) {
+    return this.usersService.updateUser(id, user);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: string) {
-    return this.usersService.deleteUser(Number(id));
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.deleteUser(id);
   }
 }
