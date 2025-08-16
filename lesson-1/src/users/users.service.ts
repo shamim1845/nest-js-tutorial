@@ -81,7 +81,7 @@ export class UsersService {
       };
     }
 
-    let filteredUsers: User[] = JSON.parse(JSON.stringify(this.users));
+    let filteredUsers = JSON.parse(JSON.stringify(this.users)) as User[];
 
     // filter by name
     if (name) {
