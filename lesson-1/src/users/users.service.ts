@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ApiResponse, User } from 'types';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 const getRandomUsers = (length: number): User[] => {
   const users = Array.from({ length }, (_, i) => {
@@ -34,12 +36,17 @@ const getRandomUsers = (length: number): User[] => {
     const randomAge = Math.floor(Math.random() * (45 - 18 + 1)) + 18;
     const randomMaritalStatus = Math.random() < 0.4; // ~40% married
 
+    const email = `${randomName.toLowerCase()}${i + 1}@example.com`;
+    const password = 'P@ssword123'; // same for all users
+
     return {
       id: i + 1,
       name: randomName.toLowerCase(),
       age: randomAge,
       gender: randomGender,
       isMarried: randomMaritalStatus,
+      email,
+      password,
     };
   });
 
@@ -48,6 +55,11 @@ const getRandomUsers = (length: number): User[] => {
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
+
   users: User[] = getRandomUsers(200);
 
   getUsers({
@@ -61,41 +73,62 @@ export class UsersService {
     page: number;
     limit: number;
   }): ApiResponse {
-    console.log({
-      name,
-      age,
-      page,
-      limit,
-    });
+    if (!this.authService.isAuthenticated) {
+      return {
+        message: 'failed',
+        statusCode: 400,
+        error: 'You are not logged in!',
+      };
+    }
+
+    let filteredUsers: User[] = JSON.parse(JSON.stringify(this.users));
+
+    // filter by name
+    if (name) {
+      filteredUsers = filteredUsers.filter((user) => user.name === name);
+    }
+
+    // filter by age
+    if (age) {
+      filteredUsers = filteredUsers.filter((user) => user.age >= age);
+    }
+
+    // pagination
+    if (page && limit) {
+      const startIndex = (page - 1) * limit;
+      const endIndex = limit * page;
+
+      filteredUsers = filteredUsers.slice(startIndex, endIndex);
+    }
 
     return {
       message: 'sucess',
       statusCode: 200,
-      data: this.users
-        .filter((user) => (name ? user.name === name : user))
-        .filter((user) => (age ? user.age >= age : user)),
-      // .slice(page - 1 * 10, limit * page),
+      data: filteredUsers,
     };
   }
 
   getUserById(id: number): ApiResponse {
+    const user = this.users.find((user) => user.id === id);
+
     return {
       message: 'sucess',
       statusCode: 200,
-      data: this.users.find((user) => user.id === id),
+      data: user,
     };
   }
 
   createUser(user: CreateUserDto): ApiResponse {
-    const currentUser = {
-      id: this.users.length + 1,
-      ...{
-        name: user?.name,
-        age: user?.age,
-        gender: user?.gender,
-        isMarried: user?.isMarried,
-      },
-    };
+    let currentUser = { ...user } as User;
+
+    if (!user.id) {
+      delete user.id;
+
+      currentUser = {
+        id: this.users.length + 1,
+        ...user,
+      };
+    }
 
     this.users.push(currentUser);
 
@@ -106,7 +139,7 @@ export class UsersService {
     };
   }
 
-  updateUser(id: number, userData: User): ApiResponse {
+  updateUser(id: number, userData: UpdateUserDto): ApiResponse {
     const currentUser = this.users.find((u) => u.id === id);
 
     if (!currentUser) {

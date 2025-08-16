@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 export interface ApiResponse {
   message: string;
   statusCode: number;
@@ -12,4 +11,6 @@ export type User = {
   age: number;
   gender?: string;
   isMarried: boolean;
+  email: string;
+  password: string;
 };
