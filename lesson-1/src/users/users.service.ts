@@ -62,127 +62,123 @@ export class UsersService {
 
   users: User[] = getRandomUsers(200);
 
-  getUsers({
-    name,
-    age,
-    page,
-    limit,
-  }: {
-    name: string;
-    age: number;
-    page: number;
-    limit: number;
-  }): ApiResponse {
-    if (!this.authService.isAuthenticated) {
-      return {
-        message: 'failed',
-        statusCode: 400,
-        error: 'You are not logged in!',
-      };
-    }
+  // getUsers({
+  //   name,
+  //   age,
+  //   page,
+  //   limit,
+  // }: {
+  //   name: string;
+  //   age: number;
+  //   page: number;
+  //   limit: number;
+  // }): ApiResponse {
+  //   if (!this.authService.isAuthenticated) {
+  //     return {
+  //       message: 'failed',
+  //       statusCode: 400,
+  //       error: 'You are not logged in!',
+  //     };
+  //   }
 
-    let filteredUsers = JSON.parse(JSON.stringify(this.users)) as User[];
+  //   let filteredUsers = JSON.parse(JSON.stringify(this.users)) as User[];
 
-    // filter by name
-    if (name) {
-      filteredUsers = filteredUsers.filter((user) => user.name === name);
-    }
+  //   // filter by name
+  //   if (name) {
+  //     filteredUsers = filteredUsers.filter((user) => user.name === name);
+  //   }
 
-    // filter by age
-    if (age) {
-      filteredUsers = filteredUsers.filter((user) => user.age >= age);
-    }
+  //   // filter by age
+  //   if (age) {
+  //     filteredUsers = filteredUsers.filter((user) => user.age >= age);
+  //   }
 
-    // pagination
-    if (page && limit) {
-      const startIndex = (page - 1) * limit;
-      const endIndex = limit * page;
+  //   // pagination
+  //   if (page && limit) {
+  //     const startIndex = (page - 1) * limit;
+  //     const endIndex = limit * page;
 
-      filteredUsers = filteredUsers.slice(startIndex, endIndex);
-    }
+  //     filteredUsers = filteredUsers.slice(startIndex, endIndex);
+  //   }
 
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: filteredUsers,
-    };
-  }
+  //   return {
+  //     message: 'sucess',
+  //     statusCode: 200,
+  //     data: filteredUsers,
+  //   };
+  // }
 
-  getUserById(id: number): ApiResponse {
-    const user = this.users.find((user) => user.id === id);
+  // getUserById(id: number): ApiResponse {
+  //   const user = this.users.find((user) => user.id === id);
 
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: user,
-    };
-  }
+  //   return {
+  //     message: 'sucess',
+  //     statusCode: 200,
+  //     data: user,
+  //   };
+  // }
 
   createUser(user: CreateUserDto): ApiResponse {
-    let currentUser = { ...user } as User;
-
-    if (!user.id) {
-      delete user.id;
-
-      currentUser = {
-        id: this.users.length + 1,
-        ...user,
-      };
-    }
-
-    this.users.push(currentUser);
-
+    // let currentUser = { ...user } as User;
+    // if (!user.id) {
+    //   delete user.id;
+    //   currentUser = {
+    //     id: this.users.length + 1,
+    //     ...user,
+    //   };
+    // }
+    // this.users.push(currentUser);
     return {
       message: 'sucess',
       statusCode: 201,
-      data: currentUser,
+      data: 'currentUser',
     };
   }
 
-  updateUser(id: number, userData: UpdateUserDto): ApiResponse {
-    const currentUser = this.users.find((u) => u.id === id);
+  // updateUser(id: number, userData: UpdateUserDto): ApiResponse {
+  //   const currentUser = this.users.find((u) => u.id === id);
 
-    if (!currentUser) {
-      return {
-        message: 'User not found!',
-        statusCode: 400,
-        data: null,
-      };
-    }
+  //   if (!currentUser) {
+  //     return {
+  //       message: 'User not found!',
+  //       statusCode: 400,
+  //       data: null,
+  //     };
+  //   }
 
-    const updatedUser = { ...currentUser, ...userData };
+  //   const updatedUser = { ...currentUser, ...userData };
 
-    this.users = this.users.map((u) => {
-      if (u.id === id) {
-        return updatedUser;
-      }
-      return u;
-    });
+  //   this.users = this.users.map((u) => {
+  //     if (u.id === id) {
+  //       return updatedUser;
+  //     }
+  //     return u;
+  //   });
 
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: updatedUser,
-    };
-  }
+  //   return {
+  //     message: 'sucess',
+  //     statusCode: 200,
+  //     data: updatedUser,
+  //   };
+  // }
 
-  deleteUser(id: number): ApiResponse {
-    const currentUser = this.users.find((u) => u.id === id);
+  // deleteUser(id: number): ApiResponse {
+  //   const currentUser = this.users.find((u) => u.id === id);
 
-    if (!currentUser) {
-      return {
-        message: 'User not found!',
-        statusCode: 400,
-        data: null,
-      };
-    }
+  //   if (!currentUser) {
+  //     return {
+  //       message: 'User not found!',
+  //       statusCode: 400,
+  //       data: null,
+  //     };
+  //   }
 
-    this.users = this.users.filter((u) => u.id !== id);
+  //   this.users = this.users.filter((u) => u.id !== id);
 
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: currentUser,
-    };
-  }
+  //   return {
+  //     message: 'sucess',
+  //     statusCode: 200,
+  //     data: currentUser,
+  //   };
+  // }
 }

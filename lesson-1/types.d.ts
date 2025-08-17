@@ -6,7 +6,6 @@ export interface ApiResponse {
 }
 
 export type User = {
-  id: number;
   name: string;
   age: number;
   gender?: string;

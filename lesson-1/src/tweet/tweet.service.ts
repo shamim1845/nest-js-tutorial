@@ -23,20 +23,20 @@ export class TweetService {
   }
 
   getTweetsByUserId(userId: number): ApiResponse {
-    const user = this.usersService.getUserById(userId).data;
-    const tweets = this.tweets.filter((tweet) => tweet.userId === userId);
+    // const user = this.usersService.getUserById(userId).data;
+    // const tweets = this.tweets.filter((tweet) => tweet.userId === userId);
 
-    // transformation
-    const response = tweets.map((tweet) => ({
-      text: tweet.text,
-      date: tweet.date,
-      name: user.name,
-    }));
+    // // transformation
+    // const response = tweets.map((tweet) => ({
+    //   text: tweet.text,
+    //   date: tweet.date,
+    //   name: user.name,
+    // }));
 
     return {
       message: 'sucess',
       statusCode: 200,
-      data: response,
+      data: 'response',
     };
   }
 }
