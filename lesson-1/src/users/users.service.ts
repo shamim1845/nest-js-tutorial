@@ -60,8 +60,6 @@ export class UsersService {
   }
 
   async createUser(user: CreateUserDto): Promise<ApiResponse> {
-    console.log(user);
-
     const existing_user = await this.userRepository.findOneBy({
       email: user.email,
     });

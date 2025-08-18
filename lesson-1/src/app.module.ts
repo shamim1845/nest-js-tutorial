@@ -9,9 +9,13 @@ import { TweetModule } from './tweet/tweet.module';
 import { AuthModule } from './auth/auth.module';
 
 import { User } from './users/user.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes the configuration available globally
+    }),
     TypeOrmModule.forRootAsync({
       imports: [],
       inject: [],
@@ -22,7 +26,7 @@ import { User } from './users/user.entity';
         host: 'localhost',
         port: 5432,
         username: 'postgres',
-        password: 'Samimraj1845',
+        password: String(process.env.DB_PASSWORD),
         database: 'postgres',
       }),
     }),
