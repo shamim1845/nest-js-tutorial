@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { ApiResponse } from 'types';
 
 @Injectable()
 export class AppService {
-  getHomeContent(): object {
+  getHomeContent(): ApiResponse {
     return {
-      msg: 'hello',
-      status: 500,
+      message: 'hello',
+      statusCode: 500,
+      data: { content: 'Welcome to the NestJS application!' },
     };
   }
 }
