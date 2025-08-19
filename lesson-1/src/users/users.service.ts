@@ -112,23 +112,32 @@ export class UsersService {
     };
   }
 
-  // deleteUser(id: number): ApiResponse {
-  //   const currentUser = this.users.find((u) => u.id === id);
+  async deleteUser(id: number): Promise<ApiResponse> {
+    const existing_user = await this.userRepository.findOneBy({
+      id,
+    });
 
-  //   if (!currentUser) {
-  //     return {
-  //       message: 'User not found!',
-  //       statusCode: 400,
-  //       data: null,
-  //     };
-  //   }
+    if (!existing_user) {
+      return {
+        message: 'User not found!',
+        statusCode: 400,
+        data: null,
+      };
+    }
 
-  //   this.users = this.users.filter((u) => u.id !== id);
+    const deleteResult = await this.userRepository.delete(id);
+    if (!deleteResult.affected) {
+      return {
+        message: 'Failed to delete user!',
+        statusCode: 500,
+        data: null,
+      };
+    }
 
-  //   return {
-  //     message: 'sucess',
-  //     statusCode: 200,
-  //     data: currentUser,
-  //   };
-  // }
+    return {
+      message: 'sucess',
+      statusCode: 200,
+      data: deleteResult, // Return the deleted user data if available
+    };
+  }
 }

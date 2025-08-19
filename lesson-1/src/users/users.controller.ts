@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -59,8 +60,8 @@ export class UsersController {
     return this.usersService.updateUser(id, user);
   }
 
-  // @Delete(':id')
-  // deleteUser(@Param('id', ParseIntPipe) id: number) {
-  //   return this.usersService.deleteUser(id);
-  // }
+  @Delete(':id')
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.deleteUser(id);
+  }
 }
