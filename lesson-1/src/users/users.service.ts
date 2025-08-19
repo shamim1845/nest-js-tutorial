@@ -15,23 +15,15 @@ export class UsersService {
   ) {}
 
   async getUsers({
-    name,
-    age,
     page,
     limit,
   }: {
-    name: string;
-    age: number;
     page: number;
     limit: number;
   }): Promise<ApiResponse> {
     const users = await this.userRepository.find({
       skip: (page - 1) * limit,
       take: limit,
-      where: {
-        ...(name && { firstName: name }),
-        ...(age && { age: age }),
-      },
     });
 
     return {
@@ -59,10 +51,12 @@ export class UsersService {
     };
   }
 
-  async createUser(user: CreateUserDto): Promise<ApiResponse> {
+  async createUser(userDto: CreateUserDto): Promise<ApiResponse> {
     const existing_user = await this.userRepository.findOneBy({
-      email: user.email,
+      email: userDto.email,
     });
+
+    console.log({ existing_user });
 
     if (existing_user) {
       return {
@@ -72,7 +66,7 @@ export class UsersService {
       };
     }
 
-    const newUser = this.userRepository.create(user);
+    const newUser = this.userRepository.create(userDto);
     await this.userRepository.save(newUser);
 
     return {

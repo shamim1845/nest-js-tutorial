@@ -1,29 +1,17 @@
 import {
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString({ message: 'First name should be a string value.' })
+  @IsString({ message: 'Username should be a string value.' })
   @IsNotEmpty()
-  @MinLength(3, { message: 'First name should be at least 3 characters long.' })
-  @MaxLength(100, { message: 'First name should not exceed 100 characters.' })
-  firstName: string;
-
-  @IsString({ message: 'Last name should be a string value.' })
-  @IsNotEmpty()
-  @MinLength(3, { message: 'Last name should be at least 3 characters long.' })
-  @MaxLength(100, { message: 'Last name should not exceed 100 characters.' })
-  lastName: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(10, { message: 'Gender should not exceed 10 characters.' })
-  gender?: string;
+  @MinLength(3, { message: 'Username should be at least 3 characters long.' })
+  @MaxLength(24, { message: 'Username should not exceed 24 characters.' })
+  username: string;
 
   @IsEmail()
   @IsNotEmpty()

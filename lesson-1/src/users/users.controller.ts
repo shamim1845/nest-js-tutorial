@@ -21,20 +21,18 @@ export class UsersController {
 
   @Get()
   getUsers(
-    @Query('name') name: string,
-    @Query('age', new DefaultValuePipe(0), ParseIntPipe) age: number,
+    // @Query('name') name: string,
+    // @Query('age', new DefaultValuePipe(0), ParseIntPipe) age: number,
     // For pagination
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
     console.log({
-      name,
-      age,
       page,
       limit,
     });
 
-    return this.usersService.getUsers({ name, age, page, limit });
+    return this.usersService.getUsers({ page, limit });
   }
 
   @Get(':id')
