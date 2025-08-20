@@ -1,8 +1,11 @@
+import { Profile } from 'src/profile/profile.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -34,6 +37,14 @@ export class User {
     length: 100,
   })
   password: string;
+
+  @OneToOne(() => Profile)
+  @JoinColumn({
+    name: 'profileId',
+    referencedColumnName: 'id',
+    foreignKeyConstraintName: 'FK_User_Profile',
+  })
+  profile?: Profile;
 
   @CreateDateColumn()
   createdAt: Date;
