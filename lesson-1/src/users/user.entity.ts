@@ -38,12 +38,10 @@ export class User {
   })
   password: string;
 
-  @OneToOne(() => Profile)
-  @JoinColumn({
-    name: 'profileId',
-    referencedColumnName: 'id',
-    foreignKeyConstraintName: 'FK_User_Profile',
+  @OneToOne(() => Profile, {
+    cascade: ['insert'],
   })
+  @JoinColumn()
   profile?: Profile;
 
   @CreateDateColumn()

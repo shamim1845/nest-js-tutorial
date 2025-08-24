@@ -6,12 +6,16 @@ import { ApiResponse } from 'types';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './user.entity';
+import { Profile } from 'src/profile/profile.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(Profile)
+    private profileRepository: Repository<Profile>,
   ) {}
 
   async getUsers({
@@ -52,21 +56,34 @@ export class UsersService {
   }
 
   async createUser(userDto: CreateUserDto): Promise<ApiResponse> {
-    const existing_user = await this.userRepository.findOneBy({
-      email: userDto.email,
-    });
+    // Check if a user with the same email or username already exists
+    const existing_user = await this.userRepository.findOneBy([
+      { email: userDto.email },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      { username: userDto.username },
+    ]);
 
     console.log({ existing_user });
 
     if (existing_user) {
       return {
-        message: 'User with this email already exists!',
+        message: 'User with this email or username already exists!',
         statusCode: 400,
         data: null,
       };
     }
 
+    // Create a profile for the new user
+    userDto.profile = (userDto?.profile as Partial<Profile>) ?? {};
+    // const profile = this.profileRepository.create(
+    //   userDto.profile as Partial<Profile>,
+    // );
+    // await this.profileRepository.save(profile);
+
     const newUser = this.userRepository.create(userDto);
+    // Assign the profile to the user
+    // newUser.profile = profile;
+
     await this.userRepository.save(newUser);
 
     return {
