@@ -4,7 +4,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -38,10 +37,10 @@ export class User {
   })
   password: string;
 
-  @OneToOne(() => Profile, {
+  @OneToOne(() => Profile, (profile) => profile.user, {
     cascade: ['insert'],
+    eager: true,
   })
-  @JoinColumn()
   profile?: Profile;
 
   @CreateDateColumn()

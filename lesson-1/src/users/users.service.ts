@@ -28,6 +28,10 @@ export class UsersService {
     const users = await this.userRepository.find({
       skip: (page - 1) * limit,
       take: limit,
+      // relations: {
+      //   profile: true,
+      // },
+      // relations: ['profile'],
     });
 
     return {
@@ -124,11 +128,11 @@ export class UsersService {
   }
 
   async deleteUser(id: number): Promise<ApiResponse> {
-    const existing_user = await this.userRepository.findOneBy({
+    const user = await this.userRepository.findOneBy({
       id,
     });
 
-    if (!existing_user) {
+    if (!user) {
       return {
         message: 'User not found!',
         statusCode: 400,
@@ -144,6 +148,10 @@ export class UsersService {
         data: null,
       };
     }
+
+    // if (user.profile) {
+    //   await this.profileRepository.delete({ id: user.profile.id });
+    // }
 
     return {
       message: 'sucess',

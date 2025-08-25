@@ -1,24 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
 import { ApiResponse } from 'types';
+import { CreateTweetDto } from './dto/create-tweet.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Tweet } from './tweet.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TweetService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @InjectRepository(Tweet)
+    private tweetRepository: Repository<Tweet>,
+  ) {}
 
-  private tweets: { text: String; date: Date; userId: Number }[] = [
-    { text: 'tweet 1', date: new Date('2025-7-22'), userId: 1 },
-    { text: 'tweet 2', date: new Date('2025-6-26'), userId: 2 },
-    { text: 'tweet 3', date: new Date('2025-5-28'), userId: 2 },
-  ];
+  async createTweet(tweet: CreateTweetDto): Promise<ApiResponse> {
+    const newTweet = this.tweetRepository.create(tweet);
+    await this.tweetRepository.save(newTweet);
+
+    return {
+      message: 'Tweet created successfully',
+      statusCode: 201,
+      data: tweet,
+    };
+  }
 
   getTweets(): ApiResponse {
-    const filteredTweets = this.tweets;
-
     return {
       message: 'sucess',
       statusCode: 200,
-      data: filteredTweets,
+      data: 'filteredTweets',
     };
   }
 

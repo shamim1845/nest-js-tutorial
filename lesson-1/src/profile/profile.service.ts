@@ -22,4 +22,39 @@ export class ProfileService {
       data: profile,
     };
   }
+
+  async getProfiles(): Promise<ApiResponse> {
+    const profiles = await this.profileRepository.find({
+      // relations: {
+      //   user: true,
+      // },
+      relations: ['user'],
+    });
+
+    return {
+      message: 'Success',
+      statusCode: 200,
+      data: profiles,
+    };
+  }
+
+  async deleteProfile(id: number): Promise<ApiResponse> {
+    const profile = await this.profileRepository.findOneBy({ id });
+
+    if (!profile) {
+      return {
+        message: 'Profile not found!',
+        statusCode: 404,
+        data: null,
+      };
+    }
+
+    await this.profileRepository.delete({ id });
+
+    return {
+      message: 'Profile deleted successfully',
+      statusCode: 200,
+      data: null,
+    };
+  }
 }
