@@ -9,7 +9,7 @@ import { CreateProfileDto } from './dtos/create-profile.dto';
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
+    private readonly profileRepository: Repository<Profile>,
   ) {}
 
   async createProfile(profileDto: CreateProfileDto): Promise<ApiResponse> {
@@ -25,9 +25,6 @@ export class ProfileService {
 
   async getProfiles(): Promise<ApiResponse> {
     const profiles = await this.profileRepository.find({
-      // relations: {
-      //   user: true,
-      // },
       relations: ['user'],
     });
 
@@ -49,12 +46,19 @@ export class ProfileService {
       };
     }
 
-    await this.profileRepository.delete({ id });
+    const deleteResult = await this.profileRepository.delete({ id });
+    if (!deleteResult.affected) {
+      return {
+        message: 'Failed to delete Profile!',
+        statusCode: 500,
+        data: null,
+      };
+    }
 
     return {
       message: 'Profile deleted successfully',
       statusCode: 200,
-      data: null,
+      data: deleteResult,
     };
   }
 }

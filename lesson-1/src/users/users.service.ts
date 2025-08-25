@@ -12,10 +12,10 @@ import { Profile } from 'src/profile/profile.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
 
     @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
+    private readonly profileRepository: Repository<Profile>,
   ) {}
 
   async getUsers({
@@ -28,10 +28,7 @@ export class UsersService {
     const users = await this.userRepository.find({
       skip: (page - 1) * limit,
       take: limit,
-      // relations: {
-      //   profile: true,
-      // },
-      // relations: ['profile'],
+      relations: ['profile'],
     });
 
     return {
@@ -42,7 +39,10 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<ApiResponse> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['profile'],
+    });
 
     if (!user) {
       return {
@@ -61,15 +61,12 @@ export class UsersService {
 
   async createUser(userDto: CreateUserDto): Promise<ApiResponse> {
     // Check if a user with the same email or username already exists
-    const existing_user = await this.userRepository.findOneBy([
+    const user = await this.userRepository.findOneBy([
       { email: userDto.email },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       { username: userDto.username },
     ]);
 
-    console.log({ existing_user });
-
-    if (existing_user) {
+    if (user) {
       return {
         message: 'User with this email or username already exists!',
         statusCode: 400,
@@ -77,17 +74,10 @@ export class UsersService {
       };
     }
 
-    // Create a profile for the new user
+    // Ensure profile is at least an empty object
     userDto.profile = (userDto?.profile as Partial<Profile>) ?? {};
-    // const profile = this.profileRepository.create(
-    //   userDto.profile as Partial<Profile>,
-    // );
-    // await this.profileRepository.save(profile);
 
     const newUser = this.userRepository.create(userDto);
-    // Assign the profile to the user
-    // newUser.profile = profile;
-
     await this.userRepository.save(newUser);
 
     return {
@@ -98,11 +88,11 @@ export class UsersService {
   }
 
   async updateUser(id: number, userData: UpdateUserDto): Promise<ApiResponse> {
-    const existing_user = await this.userRepository.findOneBy({
+    const user = await this.userRepository.findOneBy({
       id,
     });
 
-    if (!existing_user) {
+    if (!user) {
       return {
         message: 'User not found!',
         statusCode: 400,
@@ -149,14 +139,10 @@ export class UsersService {
       };
     }
 
-    // if (user.profile) {
-    //   await this.profileRepository.delete({ id: user.profile.id });
-    // }
-
     return {
       message: 'sucess',
       statusCode: 200,
-      data: deleteResult, // Return the deleted user data if available
+      data: deleteResult,
     };
   }
 }

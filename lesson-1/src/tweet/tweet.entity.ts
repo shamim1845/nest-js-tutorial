@@ -3,7 +3,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
@@ -32,9 +31,8 @@ export class Tweet {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.id, {
+  @ManyToOne(() => User, (user) => user.tweets, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
   user: User;
 }

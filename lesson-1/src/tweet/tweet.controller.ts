@@ -19,9 +19,9 @@ export class TweetController {
     return this.tweetService.getTweets();
   }
 
-  @Get(':id')
-  getTweetsByUserId(@Param('id', ParseIntPipe) id: number) {
-    return this.tweetService.getTweetsByUserId(id);
+  @Get(':userId')
+  getTweetsByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.tweetService.getTweetsByUserId(userId);
   }
 
   @Post()

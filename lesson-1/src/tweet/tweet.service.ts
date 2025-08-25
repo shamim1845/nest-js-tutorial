@@ -4,48 +4,67 @@ import { CreateTweetDto } from './dto/create-tweet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tweet } from './tweet.entity';
 import { Repository } from 'typeorm';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class TweetService {
   constructor(
     @InjectRepository(Tweet)
-    private tweetRepository: Repository<Tweet>,
+    private readonly tweetRepository: Repository<Tweet>,
+    private readonly userService: UsersService,
   ) {}
 
   async createTweet(tweet: CreateTweetDto): Promise<ApiResponse> {
-    const newTweet = this.tweetRepository.create(tweet);
+    //  Find the user by userId
+    const userResponse = await this.userService.getUserById(tweet.userId);
+
+    const user = userResponse.data as User;
+
+    if (!user) {
+      return {
+        message: 'User not found!',
+        statusCode: 404,
+        data: null,
+      };
+    }
+
+    delete user.profile;
+
+    // Create and save the tweet
+    const newTweet = this.tweetRepository.create({
+      ...tweet,
+      user,
+    });
     await this.tweetRepository.save(newTweet);
 
     return {
       message: 'Tweet created successfully',
       statusCode: 201,
-      data: tweet,
+      data: newTweet,
     };
   }
 
-  getTweets(): ApiResponse {
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: 'filteredTweets',
-    };
-  }
-
-  getTweetsByUserId(userId: number): ApiResponse {
-    // const user = this.usersService.getUserById(userId).data;
-    // const tweets = this.tweets.filter((tweet) => tweet.userId === userId);
-
-    // // transformation
-    // const response = tweets.map((tweet) => ({
-    //   text: tweet.text,
-    //   date: tweet.date,
-    //   name: user.name,
-    // }));
+  async getTweets(): Promise<ApiResponse> {
+    const tweets = await this.tweetRepository.find({ relations: ['user'] });
 
     return {
       message: 'sucess',
       statusCode: 200,
-      data: 'response',
+      data: tweets,
+    };
+  }
+
+  async getTweetsByUserId(userId: number): Promise<ApiResponse> {
+    const tweets = await this.tweetRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
+
+    return {
+      message: 'sucess',
+      statusCode: 200,
+      data: tweets,
     };
   }
 }
