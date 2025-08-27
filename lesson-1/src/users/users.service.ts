@@ -41,7 +41,7 @@ export class UsersService {
   async getUserById(id: number): Promise<ApiResponse> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['profile'],
+      relations: ['profile', 'tweets'],
     });
 
     if (!user) {

@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { ProfileModule } from './profile/profile.module';
+import { HashtagModule } from './hashtag/hashtag.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ProfileModule } from './profile/profile.module';
     }),
     UsersModule,
     TweetModule,
+    HashtagModule,
     AuthModule,
     ProfileModule,
   ],

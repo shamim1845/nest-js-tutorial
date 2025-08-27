@@ -3,15 +3,20 @@ import { ApiResponse } from 'types';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tweet } from './tweet.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.entity';
+import { Hashtag } from 'src/hashtag/entities/hashtag.entity';
 
 @Injectable()
 export class TweetService {
   constructor(
     @InjectRepository(Tweet)
     private readonly tweetRepository: Repository<Tweet>,
+
+    @InjectRepository(Hashtag)
+    private readonly hashtagRepository: Repository<Hashtag>,
+
     private readonly userService: UsersService,
   ) {}
 
@@ -29,13 +34,44 @@ export class TweetService {
       };
     }
 
-    delete user.profile;
+    console.log(tweet);
+
+    // 2️⃣ Handle hashtags
+    let hashtags: Hashtag[] = [];
+    if (tweet.hashtags && tweet.hashtags.length > 0) {
+      // find existing hashtags
+      const existing = await this.hashtagRepository.find({
+        // where: tweet.hashtags.map((name) => ({ name })),
+        where: {
+          name: In(tweet.hashtags),
+        },
+      });
+
+      const existingNames = existing.map((h) => h.name);
+
+      // create new ones for missing names
+      const newOnes = tweet.hashtags
+        .filter((name) => !existingNames.includes(name))
+        .map((name) => {
+          const h = new Hashtag();
+          h.name = name;
+          return h;
+        });
+
+      hashtags = [...existing, ...newOnes];
+    }
+
+    console.log(hashtags);
 
     // Create and save the tweet
     const newTweet = this.tweetRepository.create({
       ...tweet,
       user,
+      hashtags: hashtags,
     });
+
+    console.log(newTweet);
+
     await this.tweetRepository.save(newTweet);
 
     return {
@@ -46,7 +82,9 @@ export class TweetService {
   }
 
   async getTweets(): Promise<ApiResponse> {
-    const tweets = await this.tweetRepository.find({ relations: ['user'] });
+    const tweets = await this.tweetRepository.find({
+      relations: ['user', 'hashtag'],
+    });
 
     return {
       message: 'sucess',
@@ -58,7 +96,7 @@ export class TweetService {
   async getTweetsByUserId(userId: number): Promise<ApiResponse> {
     const tweets = await this.tweetRepository.find({
       where: { user: { id: userId } },
-      relations: ['user'],
+      relations: ['user', 'hashtag'],
     });
 
     return {
