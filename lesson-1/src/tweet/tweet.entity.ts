@@ -41,6 +41,7 @@ export class Tweet {
 
   @ManyToMany(() => Hashtag, {
     cascade: ['insert'],
+    onDelete: 'CASCADE',
   })
   @JoinTable({
     name: 'tweet_hashtag',
