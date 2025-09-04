@@ -103,7 +103,7 @@ export class HashtagService {
     }
 
     // Delete the hashtag
-    const result = await this.hashtagRepository.remove(hashtag);
+    const result = await this.hashtagRepository.softDelete({ id });
     if (!result) {
       return {
         message: 'Failed to delete hashtag',

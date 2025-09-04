@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiResponse } from 'types';
@@ -25,17 +29,36 @@ export class UsersService {
     page: number;
     limit: number;
   }): Promise<ApiResponse> {
-    const users = await this.userRepository.find({
-      skip: (page - 1) * limit,
-      take: limit,
-      relations: ['profile'],
-    });
+    console.log('NODE_ENV', String(process.env.NODE_ENV));
+    console.log('ENV_MODE', String(process.env.ENV_MODE));
 
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: users,
-    };
+    try {
+      const users = await this.userRepository.find({
+        skip: (page - 1) * limit,
+        take: limit,
+        relations: ['profile'],
+      });
+
+      return {
+        message: 'sucess',
+        statusCode: 200,
+        data: users,
+      };
+    } catch (error) {
+      console.log(error);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (error?.code === 'ECONNREFUSED') {
+        throw new RequestTimeoutException(
+          'An error has occured. Please try again.',
+          {
+            description: 'Could not connect to database.',
+          },
+        );
+      }
+
+      throw new BadRequestException('Unknown error');
+    }
   }
 
   async getUserById(id: number): Promise<ApiResponse> {
@@ -60,31 +83,44 @@ export class UsersService {
   }
 
   async createUser(userDto: CreateUserDto): Promise<ApiResponse> {
-    // Check if a user with the same email or username already exists
-    const user = await this.userRepository.findOneBy([
-      { email: userDto.email },
-      { username: userDto.username },
-    ]);
+    try {
+      // Check if a user with the same email or username already exists
+      const user = await this.userRepository.findOneBy([
+        { email: userDto.email },
+        { username: userDto.username },
+      ]);
 
-    if (user) {
+      if (user) {
+        throw new BadRequestException(
+          'User with this email or username already exists!',
+        );
+      }
+
+      // Ensure profile is at least an empty object
+      userDto.profile = (userDto?.profile as Partial<Profile>) ?? {};
+
+      const newUser = this.userRepository.create(userDto);
+      await this.userRepository.save(newUser);
+
       return {
-        message: 'User with this email or username already exists!',
-        statusCode: 400,
-        data: null,
+        message: 'sucess',
+        statusCode: 201,
+        data: newUser,
       };
+    } catch (error) {
+      console.log('Err =>>>>: ', error);
+
+      if (error?.code === 'ECONNREFUSED') {
+        throw new RequestTimeoutException(
+          'An error has occured. Please try again.',
+          {
+            description: 'Could not connect to database.',
+          },
+        );
+      }
+
+      throw error;
     }
-
-    // Ensure profile is at least an empty object
-    userDto.profile = (userDto?.profile as Partial<Profile>) ?? {};
-
-    const newUser = this.userRepository.create(userDto);
-    await this.userRepository.save(newUser);
-
-    return {
-      message: 'sucess',
-      statusCode: 201,
-      data: newUser,
-    };
   }
 
   async updateUser(id: number, userData: UpdateUserDto): Promise<ApiResponse> {

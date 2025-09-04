@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ApiResponse } from 'types';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -49,6 +49,8 @@ export class TweetService {
       });
 
       const existingNames = existing.map((h) => h.name);
+
+      console.log({ existingNames });
 
       // create new ones for missing names
       const newOnes = tweet.hashtags
@@ -186,7 +188,7 @@ export class TweetService {
 
   async getTweets(): Promise<ApiResponse> {
     const tweets = await this.tweetRepository.find({
-      relations: ['user', 'hashtag'],
+      relations: ['user', 'hashtags'],
     });
 
     return {
@@ -197,10 +199,24 @@ export class TweetService {
   }
 
   async getTweetsByUserId(userId: number): Promise<ApiResponse> {
+    //  Find the user by userId
+    const userResponse = await this.userService.getUserById(userId);
+
+    const user = userResponse.data as User;
+
+    if (!user) {
+      throw new NotFoundException(`User with userId ${userId} is not found!`);
+    }
+
+    // Find tweets by userId
     const tweets = await this.tweetRepository.find({
       where: { user: { id: userId } },
-      relations: ['user', 'hashtag'],
+      relations: ['user', 'hashtags'],
     });
+
+    if (tweets.length === 0) {
+      throw new NotFoundException('No tweets found for this user');
+    }
 
     return {
       message: 'sucess',
