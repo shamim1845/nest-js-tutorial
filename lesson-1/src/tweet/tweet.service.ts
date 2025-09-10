@@ -8,6 +8,8 @@ import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.entity';
 import { Hashtag } from 'src/hashtag/entities/hashtag.entity';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
+import { GetTweetQueryDto } from './dto/get-tweet-query-dto';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 
 @Injectable()
 export class TweetService {
@@ -19,6 +21,7 @@ export class TweetService {
     private readonly hashtagRepository: Repository<Hashtag>,
 
     private readonly userService: UsersService,
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
   async createTweet(tweet: CreateTweetDto): Promise<ApiResponse> {
@@ -186,10 +189,25 @@ export class TweetService {
     };
   }
 
-  async getTweets(): Promise<ApiResponse> {
-    const tweets = await this.tweetRepository.find({
-      relations: ['user', 'hashtags'],
+  async getTweets({
+    page,
+    limit,
+    startdate,
+    enddate,
+  }: GetTweetQueryDto): Promise<ApiResponse> {
+    const tweets = await this.paginationProvider.paginateQuery({
+      paginationQueryDto: { page, limit },
+      repository: this.tweetRepository,
     });
+
+    // const tweets = await this.tweetRepository.find({
+    //   ...(page &&
+    //     limit && {
+    //       skip: (page - 1) * limit,
+    //       take: limit,
+    //     }),
+    //   relations: ['user', 'hashtags'],
+    // });
 
     return {
       message: 'sucess',

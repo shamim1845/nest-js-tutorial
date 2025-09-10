@@ -14,6 +14,7 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { appConfig } from './config/app.config';
 import { databaseConfig } from './config/database.config';
 import { envValidationSchema } from './config/env.validation';
+import { PaginationModule } from './common/pagination/pagination.module';
 
 const ENV = process.env.NODE_ENV;
 const envFilePath = !ENV
@@ -56,6 +57,7 @@ console.log({
     HashtagModule,
     AuthModule,
     ProfileModule,
+    PaginationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

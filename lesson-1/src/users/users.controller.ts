@@ -21,32 +21,19 @@ export class UsersController {
 
   @Get()
   getUsers(
-    // @Query('name') name: string,
-    // @Query('age', new DefaultValuePipe(0), ParseIntPipe) age: number,
-    // For pagination
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
-    console.log({
-      page,
-      limit,
-    });
-
     return this.usersService.getUsers({ page, limit });
   }
 
   @Get(':id')
   getUserById(@Param('id', ParseIntPipe) id: number) {
-    // console.log({ id });
-
     return this.usersService.getUserById(id);
   }
 
   @Post()
   createUser(@Body() user: CreateUserDto) {
-    // console.log(user);
-    // console.log(typeof user, user instanceof CreateUserDto);
-
     return this.usersService.createUser(user);
   }
 

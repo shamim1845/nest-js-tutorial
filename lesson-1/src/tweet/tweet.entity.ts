@@ -36,10 +36,14 @@ export class Tweet {
 
   @ManyToOne(() => User, (user) => user.tweets, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   user: User;
 
-  @ManyToMany(() => Hashtag, (hashtag) => hashtag.tweets, { cascade: true })
+  @ManyToMany(() => Hashtag, (hashtag) => hashtag.tweets, {
+    cascade: true,
+    eager: true,
+  })
   @JoinTable({
     name: 'tweet_hashtag',
     joinColumn: { name: 'tweetId', referencedColumnName: 'id' },

@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   RequestTimeoutException,
 } from '@nestjs/common';
@@ -11,6 +13,8 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './user.entity';
 import { Profile } from 'src/profile/profile.entity';
+import { UserAlreadyExistsException } from 'src/CustomExceptions/user-already-exists.exception';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +24,8 @@ export class UsersService {
 
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
   async getUsers({
@@ -29,14 +35,11 @@ export class UsersService {
     page: number;
     limit: number;
   }): Promise<ApiResponse> {
-    console.log('NODE_ENV', String(process.env.NODE_ENV));
-    console.log('ENV_MODE', String(process.env.ENV_MODE));
-
     try {
-      const users = await this.userRepository.find({
-        skip: (page - 1) * limit,
-        take: limit,
-        relations: ['profile'],
+      const users = await this.paginationProvider.paginateQuery({
+        paginationQueryDto: { page, limit },
+        repository: this.userRepository,
+        relations: ['profile', 'tweets'],
       });
 
       return {
@@ -68,11 +71,13 @@ export class UsersService {
     });
 
     if (!user) {
-      return {
-        message: 'User not found!',
-        statusCode: 404,
-        data: null,
-      };
+      throw new HttpException('User not found!', HttpStatus.NOT_FOUND, {
+        cause: new Error(
+          'The exception occured because a user with id ' +
+            id +
+            'was not found!',
+        ),
+      });
     }
 
     return {
@@ -85,15 +90,20 @@ export class UsersService {
   async createUser(userDto: CreateUserDto): Promise<ApiResponse> {
     try {
       // Check if a user with the same email or username already exists
-      const user = await this.userRepository.findOneBy([
+      const userWithEmail = await this.userRepository.findOneBy([
         { email: userDto.email },
+      ]);
+
+      if (userWithEmail) {
+        throw new UserAlreadyExistsException('email', userDto.email);
+      }
+
+      const userWithUserName = await this.userRepository.findOneBy([
         { username: userDto.username },
       ]);
 
-      if (user) {
-        throw new BadRequestException(
-          'User with this email or username already exists!',
-        );
+      if (userWithUserName) {
+        throw new UserAlreadyExistsException('username', userDto.username);
       }
 
       // Ensure profile is at least an empty object
