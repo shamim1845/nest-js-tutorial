@@ -3,7 +3,9 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
   RequestTimeoutException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -190,5 +192,37 @@ export class UsersService {
       statusCode: 200,
       data: deleteResult,
     };
+  }
+
+  // Utility function
+  async findUserByUserNameOrEmail({
+    username,
+    email,
+  }: {
+    username?: string;
+    email?: string;
+  }) {
+    let user: User | null = null;
+
+    try {
+      user = await this.userRepository.findOne({
+        where: [
+          ...(email ? [{ email }] : []),
+          ...(username ? [{ username }] : []),
+        ],
+      });
+    } catch (error) {
+      console.log(error);
+
+      throw new RequestTimeoutException(error, {
+        description: 'User with given username or email could not be found!',
+      });
+    }
+
+    if (!user) {
+      throw new UnauthorizedException('User does not exist!');
+    }
+
+    return user;
   }
 }
