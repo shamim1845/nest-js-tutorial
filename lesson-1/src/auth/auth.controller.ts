@@ -2,8 +2,10 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
+import { AllowAnonymous } from './decorators/allow-anonymous.decorator';
 
 @Controller('auth')
+@AllowAnonymous()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

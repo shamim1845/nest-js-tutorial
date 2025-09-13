@@ -3,7 +3,6 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  NotFoundException,
   RequestTimeoutException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -23,9 +22,6 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    @InjectRepository(Profile)
-    private readonly profileRepository: Repository<Profile>,
 
     private readonly paginationProvider: PaginationProvider,
   ) {}
@@ -122,6 +118,7 @@ export class UsersService {
     } catch (error) {
       console.log('Err =>>>>: ', error);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error?.code === 'ECONNREFUSED') {
         throw new RequestTimeoutException(
           'An error has occured. Please try again.',

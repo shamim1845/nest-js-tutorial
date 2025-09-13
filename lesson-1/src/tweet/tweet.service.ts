@@ -24,9 +24,12 @@ export class TweetService {
     private readonly paginationProvider: PaginationProvider,
   ) {}
 
-  async createTweet(tweet: CreateTweetDto): Promise<ApiResponse> {
+  async createTweet(
+    createTweetDto: CreateTweetDto,
+    userId: number,
+  ): Promise<ApiResponse> {
     //  Find the user by userId
-    const userResponse = await this.userService.getUserById(tweet.userId);
+    const userResponse = await this.userService.getUserById(userId);
 
     const user = userResponse.data as User;
 
@@ -38,25 +41,23 @@ export class TweetService {
       };
     }
 
-    console.log(tweet);
+    // console.log(createTweetDto);
 
     // 2️⃣ Handle hashtags
     let hashtags: Hashtag[] = [];
-    if (tweet.hashtags && tweet.hashtags.length > 0) {
+    if (createTweetDto.hashtags && createTweetDto.hashtags.length > 0) {
       // find existing hashtags
       const existing = await this.hashtagRepository.find({
         // where: tweet.hashtags.map((name) => ({ name })),
         where: {
-          name: In(tweet.hashtags),
+          name: In(createTweetDto.hashtags),
         },
       });
 
       const existingNames = existing.map((h) => h.name);
 
-      console.log({ existingNames });
-
       // create new ones for missing names
-      const newOnes = tweet.hashtags
+      const newOnes = createTweetDto.hashtags
         .filter((name) => !existingNames.includes(name))
         .map((name) => {
           const h = new Hashtag();
@@ -67,16 +68,12 @@ export class TweetService {
       hashtags = [...existing, ...newOnes];
     }
 
-    console.log(hashtags);
-
     // Create and save the tweet
     const newTweet = this.tweetRepository.create({
-      ...tweet,
+      ...createTweetDto,
       user,
       hashtags: hashtags,
     });
-
-    console.log(newTweet);
 
     await this.tweetRepository.save(newTweet);
 
@@ -189,25 +186,11 @@ export class TweetService {
     };
   }
 
-  async getTweets({
-    page,
-    limit,
-    startdate,
-    enddate,
-  }: GetTweetQueryDto): Promise<ApiResponse> {
+  async getTweets({ page, limit }: GetTweetQueryDto): Promise<ApiResponse> {
     const tweets = await this.paginationProvider.paginateQuery({
       paginationQueryDto: { page, limit },
       repository: this.tweetRepository,
     });
-
-    // const tweets = await this.tweetRepository.find({
-    //   ...(page &&
-    //     limit && {
-    //       skip: (page - 1) * limit,
-    //       take: limit,
-    //     }),
-    //   relations: ['user', 'hashtags'],
-    // });
 
     return {
       message: 'sucess',

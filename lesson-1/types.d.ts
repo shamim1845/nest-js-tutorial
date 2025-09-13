@@ -5,11 +5,7 @@ export interface ApiResponse {
   error?: string;
 }
 
-export type User = {
-  name: string;
-  age: number;
-  gender?: string;
-  isMarried: boolean;
+export interface JWT_User_Payload {
+  sub: number;
   email: string;
-  password: string;
-};
+}

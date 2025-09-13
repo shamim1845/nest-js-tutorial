@@ -7,15 +7,14 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Post,
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 
 // http://localhost:8000/users
 @Controller('users')
+// @UseGuards(AuthorizeGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -31,11 +30,6 @@ export class UsersController {
   getUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getUserById(id);
   }
-
-  // @Post()
-  // createUser(@Body() user: CreateUserDto) {
-  //   return this.usersService.createUser(user);
-  // }
 
   @Patch(':id')
   updateUser(

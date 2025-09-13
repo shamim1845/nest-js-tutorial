@@ -14,7 +14,10 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { appConfig } from './config/app.config';
 import { databaseConfig } from './config/database.config';
 import { envValidationSchema } from './config/env.validation';
-import { PaginationModule } from './common/pagination/pagination.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthorizeGuard } from './auth/guards/authorize.guard';
+import { authConfig } from './auth/config/auth.config';
+import { JwtModule } from '@nestjs/jwt';
 
 const ENV = process.env.NODE_ENV;
 const envFilePath = !ENV
@@ -31,7 +34,7 @@ console.log({
     ConfigModule.forRoot({
       isGlobal: true, // Makes the configuration available globally
       envFilePath: envFilePath,
-      load: [appConfig, databaseConfig], // Load the appConfig function to manage configurations
+      load: [appConfig, databaseConfig, authConfig], // Load the appConfig function to manage configurations
       validationSchema: envValidationSchema, // Validate environment variables
     }),
     TypeOrmModule.forRootAsync({
@@ -52,14 +55,21 @@ console.log({
         password: configService.get<string>('database.password'),
       }),
     }),
+    // ConfigModule.forFeature(authConfig),
+    JwtModule.registerAsync(authConfig.asProvider()),
     UsersModule,
     TweetModule,
     HashtagModule,
     AuthModule,
     ProfileModule,
-    PaginationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthorizeGuard,
+    },
+  ],
 })
 export class AppModule {}
