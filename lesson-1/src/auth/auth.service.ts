@@ -1,9 +1,8 @@
-import {
-  Inject,
-  Injectable,
-  RequestTimeoutException,
-  UnauthorizedException,
-} from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { ApiResponse, JWT_User_Payload } from 'types';
@@ -67,35 +66,30 @@ export class AuthService {
   }
 
   async refreshToken({ refreshToken }: RefreshTokenDto): Promise<ApiResponse> {
-    let userId: number | undefined = undefined;
-
-    // Verify refreshToken
     try {
+      // Verify refreshToken
       const payload = await this.jwtService.verifyAsync<
         Partial<JWT_User_Payload>
       >(refreshToken, this.authConfiguration);
-      console.log('payload:=>>>>', payload);
 
-      userId = payload.sub;
+      // Find the user
+      const user = await this.usersService.findUserByIdOrUserNameOrEmail({
+        id: payload.sub,
+      });
+
+      //  Generate JWT Token
+      const tokens = await this.generateToken(user);
+
+      return {
+        message: 'sucess',
+        statusCode: 200,
+        data: tokens,
+      };
     } catch (error) {
       console.log('Error:=>>', error);
 
-      throw new UnauthorizedException('Invalid refreshToken(JWT Error)!');
+      throw new UnauthorizedException(error?.message);
     }
-
-    // Find the user
-    const user = await this.usersService.findUserByIdOrUserNameOrEmail({
-      id: userId,
-    });
-
-    //  Generate JWT Token
-    const tokens = await this.generateToken(user);
-
-    return {
-      message: 'sucess',
-      statusCode: 200,
-      data: tokens,
-    };
   }
 
   private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
