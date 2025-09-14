@@ -6,6 +6,7 @@ export const envValidationSchema = joi.object({
     .valid('development', 'production', 'test')
     .default('development')
     .required(),
+  // Database config
   DB_TYPE: joi.string().valid('postgres').default('postgres').required(),
   DB_HOST: joi.string().default('localhost').required(),
   DB_PORT: joi.number().port().default(5432).required(),
@@ -14,8 +15,10 @@ export const envValidationSchema = joi.object({
   DB_PASSWORD: joi.string().required(),
   DB_SYNC: joi.boolean().default(false).required(),
   DB_AUTO_LOAD_ENTITIES: joi.boolean().default(false).required(),
+  // JWT config
   JWT_SECRET_KEY: joi.string().required(),
-  JWT_EXPIRESIN: joi.number().required(),
+  JWT_ACCESS_TOKEN_EXPIRESIN: joi.number().required(),
+  JWT_REFRESH_TOKEN_EXPIRESIN: joi.number().required(),
   JWT_AUDIENCE: joi.string().required(),
   JWT_ISSUER: joi.string().required(),
 });

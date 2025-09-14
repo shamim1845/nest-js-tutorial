@@ -192,10 +192,12 @@ export class UsersService {
   }
 
   // Utility function
-  async findUserByUserNameOrEmail({
+  async findUserByIdOrUserNameOrEmail({
+    id,
     username,
     email,
   }: {
+    id?: number;
     username?: string;
     email?: string;
   }) {
@@ -204,6 +206,7 @@ export class UsersService {
     try {
       user = await this.userRepository.findOne({
         where: [
+          ...(id ? [{ id }] : []),
           ...(email ? [{ email }] : []),
           ...(username ? [{ username }] : []),
         ],
@@ -212,7 +215,8 @@ export class UsersService {
       console.log(error);
 
       throw new RequestTimeoutException(error, {
-        description: 'User with given username or email could not be found!',
+        description:
+          'User with given id or username or email could not be found!',
       });
     }
 
