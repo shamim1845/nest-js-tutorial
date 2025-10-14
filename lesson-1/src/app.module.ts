@@ -18,6 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthorizeGuard } from './auth/guards/authorize.guard';
 import { authConfig } from './auth/config/auth.config';
 import { JwtModule } from '@nestjs/jwt';
+import { ChatGateway } from './chat/chat.gateway';
 
 const ENV = process.env.NODE_ENV;
 const envFilePath = !ENV
@@ -66,10 +67,11 @@ console.log({
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthorizeGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthorizeGuard,
+    // },
+    ChatGateway,
   ],
 })
 export class AppModule {}
