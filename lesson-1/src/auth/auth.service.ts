@@ -2,7 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { ApiResponse, JWT_User_Payload } from 'types';
@@ -16,6 +21,8 @@ import { RefreshTokenDto } from './dtos/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @Inject(authConfig.KEY)
     private readonly authConfiguration: ConfigType<typeof authConfig>,
@@ -86,7 +93,7 @@ export class AuthService {
         data: tokens,
       };
     } catch (error) {
-      console.log('Error:=>>', error);
+      this.logger.error('RefreshToken Error: =>>', error);
 
       throw new UnauthorizedException(error?.message);
     }

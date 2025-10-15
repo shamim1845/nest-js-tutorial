@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsStrongPassword,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -20,10 +21,17 @@ export class CreateUserDto {
   @MaxLength(100, { message: 'Email should not exceed 100 characters.' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  // @IsString()
+  // @IsNotEmpty()
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  })
   @MinLength(8, { message: 'Password should be at least 8 characters long.' })
-  @MaxLength(100, { message: 'Password should not exceed 100 characters.' })
+  // @MaxLength(100, { message: 'Password should not exceed 100 characters.' })
   password: string;
 
   @IsOptional()

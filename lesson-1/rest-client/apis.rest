@@ -1,0 +1,36 @@
+GET http://localhost:8000
+
+###
+POST http://localhost:8000/auth/signup
+Content-Type: application/json
+
+{
+        "username": "jane555",
+        "email": "jane555@gmail.com",
+        "password": "12345678",
+        "profile": {
+            "firstName": "Jane",
+            "lastName": "Doe",
+            "gender": "female"
+        }
+}
+
+
+###
+POST http://localhost:8000/auth/login
+Content-Type: application/json
+
+{
+        "email": "jane55@gmail.com",
+        "password": "P@ssword123"
+}
+
+
+
+###
+POST http://localhost:8000/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImlhdCI6MTc2MDUyMjEzMSwiZXhwIjoxNzYwNjA4NTMxLCJhdWQiOiJsb2NhbGhvc3Q6ODAwMCIsImlzcyI6ImxvY2FsaG9zdDo4MDAwIn1.VROrEo6nGY9Jld2IK61P_OIFfkXRX8hI8Q9yS9435Vg"
+}
