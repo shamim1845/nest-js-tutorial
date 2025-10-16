@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nestjs-config
+  namespace: nestjs-app
+data:
+  NODE_ENV: "production"
+  PORT: "8000"
+  DB_TYPE: "postgres"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "nestjs_db"
+  DB_SYNC: "false"
+  DB_AUTO_LOAD_ENTITIES: "true"
+  JWT_ACCESS_TOKEN_EXPIRESIN: "3600"
+  JWT_REFRESH_TOKEN_EXPIRESIN: "86400"
+  JWT_AUDIENCE: "nestjs-app"
+  JWT_ISSUER: "nestjs-app"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"

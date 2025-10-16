@@ -1,0 +1,16 @@
+{
+  "name": "nestjs-k6-tests",
+  "version": "1.0.0",
+  "description": "k6 load testing scripts for NestJS application",
+  "scripts": {
+    "test:load": "k6 run load-test.js",
+    "test:stress": "k6 run stress-test.js", 
+    "test:spike": "k6 run spike-test.js",
+    "test:all": "npm run test:load && npm run test:stress && npm run test:spike",
+    "test:load-local": "BASE_URL=http://localhost:8000 k6 run load-test.js",
+    "test:load-minikube": "BASE_URL=http://$(minikube ip):30080 k6 run load-test.js"
+  },
+  "keywords": ["k6", "load-testing", "nestjs", "performance"],
+  "author": "NestJS Team",
+  "license": "MIT"
+}
