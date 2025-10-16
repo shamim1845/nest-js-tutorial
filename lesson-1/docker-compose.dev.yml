@@ -1,0 +1,75 @@
+services:
+  # PostgreSQL Database for Development
+  postgres:
+    image: postgres:15-alpine
+    container_name: nestjs-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nestjs_dev_db}
+      POSTGRES_USER: ${DB_USER_NAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nestjs-dev-network
+
+  # NestJS Application for Development
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: nestjs-app-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 8000
+      DB_TYPE: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-nestjs_dev_db}
+      DB_USER_NAME: ${DB_USER_NAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_SYNC: true
+      DB_AUTO_LOAD_ENTITIES: true
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-key}
+      JWT_ACCESS_TOKEN_EXPIRESIN: ${JWT_ACCESS_TOKEN_EXPIRESIN:-3600}
+      JWT_REFRESH_TOKEN_EXPIRESIN: ${JWT_REFRESH_TOKEN_EXPIRESIN:-86400}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-dev-audience}
+      JWT_ISSUER: ${JWT_ISSUER:-dev-issuer}
+    ports:
+      - "8000:8000"
+      - "9229:9229"  # Debug port
+    depends_on:
+      - postgres
+    networks:
+      - nestjs-dev-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    command: npm run start:dev
+
+  # Redis for Development
+  redis:
+    image: redis:7-alpine
+    container_name: nestjs-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - nestjs-dev-network
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  nestjs-dev-network:
+    driver: bridge

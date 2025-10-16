@@ -1,0 +1,31 @@
+# Development Dockerfile
+FROM node:20-slim
+
+# Install dumb-init for proper signal handling
+RUN apt-get update && apt-get install -y dumb-init && rm -rf /var/lib/apt/lists/*
+
+# Create app user for security
+RUN groupadd --gid 1001 nodejs
+RUN useradd --uid 1001 --gid nodejs --shell /bin/bash --create-home nestjs
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci && npm cache clean --force
+
+# Change ownership to app user
+RUN chown -R nestjs:nodejs /app
+USER nestjs
+
+# Expose port and debug port
+EXPOSE 8000 9229
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application in development mode
+CMD ["npm", "run", "start:dev"]

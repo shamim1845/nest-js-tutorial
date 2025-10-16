@@ -14,7 +14,6 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 
 // http://localhost:8000/users
 @Controller('users')
-// @UseGuards(AuthorizeGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
