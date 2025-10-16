@@ -24,7 +24,7 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
 
     private readonly paginationProvider: PaginationProvider,
-  ) {}
+  ) { }
 
   async getUsers({
     page,
@@ -43,7 +43,7 @@ export class UsersService {
       return {
         message: 'sucess',
         statusCode: 200,
-        data: users,
+        ...users, // spread the paginated object
       };
     } catch (error) {
       console.log(error);
@@ -72,8 +72,8 @@ export class UsersService {
       throw new HttpException('User not found!', HttpStatus.NOT_FOUND, {
         cause: new Error(
           'The exception occured because a user with id ' +
-            id +
-            'was not found!',
+          id +
+          'was not found!',
         ),
       });
     }

@@ -6,7 +6,7 @@ export class AppService {
   getHomeContent(): ApiResponse {
     return {
       message: 'hello',
-      statusCode: 500,
+      statusCode: 200,
       data: { content: 'Welcome to the NestJS application!' },
     };
   }

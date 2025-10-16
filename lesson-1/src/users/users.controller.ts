@@ -16,7 +16,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 @Controller('users')
 // @UseGuards(AuthorizeGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get()
   getUsers(

@@ -22,7 +22,7 @@ export class TweetService {
 
     private readonly userService: UsersService,
     private readonly paginationProvider: PaginationProvider,
-  ) {}
+  ) { }
 
   async createTweet(
     createTweetDto: CreateTweetDto,
@@ -195,7 +195,8 @@ export class TweetService {
     return {
       message: 'sucess',
       statusCode: 200,
-      data: tweets,
+      ...tweets, // spread the paginated object
+
     };
   }
 

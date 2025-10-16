@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
@@ -18,10 +19,13 @@ import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
 // http://localhost:8000/tweet
 @Controller('tweet')
 export class TweetController {
-  constructor(private readonly tweetService: TweetService) {}
+  constructor(private readonly tweetService: TweetService) { }
 
   @Get()
-  getTweets(@Query() getTweetQueryDto: GetTweetQueryDto) {
+  getTweets(
+    @Query() getTweetQueryDto: GetTweetQueryDto,
+    @Query('test', new DefaultValuePipe(10), ParseIntPipe) test: number,
+  ) {
     return this.tweetService.getTweets(getTweetQueryDto);
   }
 

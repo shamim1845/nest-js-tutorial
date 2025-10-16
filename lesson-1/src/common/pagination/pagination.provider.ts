@@ -15,7 +15,7 @@ export class PaginationProvider {
   constructor(
     @Inject(REQUEST)
     private readonly request: Request,
-  ) {}
+  ) { }
   async paginateQuery<T extends ObjectLiteral>({
     paginationQueryDto,
     repository,
@@ -31,9 +31,9 @@ export class PaginationProvider {
     const findOptions: FindManyOptions<T> = {
       ...(paginationQueryDto.page &&
         paginationQueryDto.limit && {
-          skip: (paginationQueryDto.page - 1) * paginationQueryDto.limit,
-          take: paginationQueryDto.limit,
-        }),
+        skip: (paginationQueryDto.page - 1) * paginationQueryDto.limit,
+        take: paginationQueryDto.limit,
+      }),
     };
 
     if (where) {
@@ -83,18 +83,22 @@ export class PaginationProvider {
 
     const response: Paginated<T> = {
       data: result,
-      meta: {
-        itemsPerPage: paginationQueryDto.limit,
-        currentPage: paginationQueryDto.page,
-        totalItems: totalItems,
-        totalPages: totalPages,
-      },
-      links: {
-        first: updateUrlBySearchParams(newUrl.href, { page: firstPage }),
-        last: updateUrlBySearchParams(newUrl.href, { page: lastPage }),
-        current: updateUrlBySearchParams(newUrl.href, { page: currentPage }),
-        next: updateUrlBySearchParams(newUrl.href, { page: nextPage }),
-        previous: updateUrlBySearchParams(newUrl.href, { page: previousPage }),
+      metadata: {
+        meta: {
+          itemsPerPage: paginationQueryDto.limit,
+          currentPage: paginationQueryDto.page,
+          totalItems: totalItems,
+          totalPages: totalPages,
+        },
+        links: {
+          first: updateUrlBySearchParams(newUrl.href, { page: firstPage }),
+          last: updateUrlBySearchParams(newUrl.href, { page: lastPage }),
+          current: updateUrlBySearchParams(newUrl.href, { page: currentPage }),
+          next: updateUrlBySearchParams(newUrl.href, { page: nextPage }),
+          previous: updateUrlBySearchParams(newUrl.href, {
+            page: previousPage,
+          }),
+        },
       },
     };
 
