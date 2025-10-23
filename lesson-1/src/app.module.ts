@@ -67,10 +67,10 @@ console.log({
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthorizeGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthorizeGuard,
+    // },
     ChatGateway,
   ],
 })
